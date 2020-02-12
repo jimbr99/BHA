@@ -21,14 +21,13 @@ def db():
     global DB_URL
     GPIO.setup(4, GPIO.OUT)
     GPIO.output(4, GPIO.LOW)
+    found_list = []
+    names_unchecked = []
     
-    file = open("/home/pi/BHA-test/db_url.txt", "r")
+    file = open("/home/pi/BHA/db_url.txt", "r")
     DB_URL = file.readline()
     print('Using DB_URL ', DB_URL)
     file.close()
-    
-    
-    
     
     s = ''
     print('Starting DB...')
@@ -36,7 +35,8 @@ def db():
     try:
       cnx = mysql.connector.connect(user='pi', password='rp3',
                                 host= DB_URL, #'192.168.0.154                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ',
-                                database='epc1')
+                                database='epc1',
+                                autocommit=True)
     except mysql.connector.Error as err:
       if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print("Something is wrong with your user name or password")
@@ -47,7 +47,7 @@ def db():
     else:
       cursor = cnx.cursor();
       
-      print ("Using epc database:") 
+      print ("Using epc1 database:") 
       dbname = ("USE epc1")
       cursor.execute(dbname)
       for (dbname) in cursor:
@@ -55,7 +55,7 @@ def db():
       print ("")
       
       print ("Selecting columns:")
-      selallcol = ("SELECT epc FROM epc")
+      selallcol = ("SELECT epc FROM pid")
       cursor.execute(selallcol)
       for (selallcol) in cursor:
 #          print (selallcol[0])
@@ -86,7 +86,7 @@ def db():
               buf += "%s" % (db_output_list[i][j])
 #              print(db_output_list[i][j])
           buf += "'"
-          out = "SELECT name, msg, reg FROM epc WHERE epc=" + buf
+          out = "SELECT name, msg, reg FROM pid WHERE epc=" + buf
 #          print(out)
           #buf =''
  
@@ -99,18 +99,39 @@ def db():
               #print (selonecol[0], end=" ") #, ' %d' %(x))
               #print (selonecol[1], end=" ")
               #print (selonecol[2])
+              #print(cursor)
+              #if("MySQLCursor:" in cursor):
+                  #pass
               for (selonecol) in cursor:
                   x=len(selonecol[0])
+                  #print(x)
                   print (selonecol[0], end=" ") #, ' %d' %(x))
                   print (selonecol[1], end=" ")
                   print (selonecol[2], end=" ")
                   print(len(selonecol[2]))
                   if selonecol[0] != '':
-                      # check the reg column response (contains Yes or No)
-                      if selonecol[2] == "Yes":
-                          s =  "%s\r\n" % (selonecol[0]+ ": " + selonecol[1]+ ". ")
+                      if ant.ant_flg == 0:
+                          # check the reg column response (contains Yes or No)
+                          if selonecol[2] == "Yes":
+                              s =  "%s\r\n" % (selonecol[0]+ ": " + selonecol[1]+ ". ")
+                          else:
+                              names_unchecked.append(selonecol[0])
+                              '''
+                              y = "".join(map(str,selonecol[0]))
+                              z = "'" + y + "'"
+                              sel = "epc SET reg='Yes' WHERE name="+ z                            
+                              print(sel)
+                              
+                              cursor.execute(sel)
+                              for (sel) in cursor:
+                                  print (sel[0])
+                              '''    
+                              s =  "%s\r\n" % (selonecol[0]+ ": " + "Is now checked in.")
                       else:
-                          s =  "%s\r\n" % (selonecol[0]+ ": " + "Has not checked in.")
+                          if selonecol[2] == "Yes":
+                              s =  "%s\r\n" % (selonecol[0]+ ": " + selonecol[1]+ ". ")
+                          else:
+                              s =  "%s\r\n" % (selonecol[0]+ ": " + "Has not checked in.")
                   else:
                       s = '* * * * * * * *\r\n'
 #              print ("")
@@ -119,11 +140,36 @@ def db():
           else:
               pass
             
-          
+          found_list.append(s)
           #text_file.write("This is DB name %d\r\n" % (i))
           # Write received names to file
-          text_file.write(s)
+          #text_file.write(s)
+          s = ''
           buf = ''
+      
+      
+      # write appended sorted list
+      found_list.sort()
+      text_file.write(''.join(map(str,found_list)))
+      
+      #print(names_unchecked)
+      print("")
+      #print(names_unchecked)
+      for n in range(0, len(names_unchecked)):
+          #print(n)
+          y = "".join(map(str,names_unchecked[n]))
+          z = "'" + y + "'"
+          sel = "UPDATE pid SET reg='Yes' WHERE name="+ z                            
+          print(sel)
+          
+          cursor.execute(sel)
+          for (sel) in cursor:
+              print("W")
+              print (sel[0], end=" ") #, ' %d' %(x))
+              print (sel[1], end=" ")
+              print (sel[2])                            
+                           
+      #print(names_unchecked)         
       '''
       This GPIO operation generates an interrupt for the Flask server,
       which responds with callback to read the file for display.
@@ -134,3 +180,5 @@ def db():
        
     cnx.close()
     
+    print("")
+    print(found_list)

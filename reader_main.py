@@ -78,6 +78,7 @@ CMD_ANT_GET = [0xff,0x05,0x3F,0x01,0xA0, 0x29]
 CMD_ANT = [0xff,0x0F,0x3F,0x00,0x01,0x01,0x00,0x00,0x00,0x01,0x0B,0xB8,0x00,0x14,0xD4,0x0F]
 CMD_SINGLE_ID = [0xff,0x05,0xC8,0x00,0x3A,0x5E]
 CMD_MULTI_ID = [0xff,0x08,0xC1,0x02,0x05,0x00,0xBC]
+CMD_GET_WORK_ANT = [0xff,0x05,0x3f,0x03]
 
 #global SendData1
 
@@ -111,31 +112,103 @@ def reader_main():
     Response1_length=int_arr2()
     global ant_flg
     
-    #CMD_ANT_GET = [0xff,0x05,0x3F,0x01,0xA0, 0x29]
-#    print("cmd CMD_ANT_GET")
-    reader_cmd_setup(CMD_ANT_GET, SendData1, SendData1_length)
-#    print(binascii.hexlify(SendData1))
+    # new code
+    ##
+    print(" ")
+    print("CMD_SET_WORK_ANT_PARA ")
+    CMD_SET_WORK_ANT_PARA = [0xff,0x1b,0x3f,0x00,0x04,0x03,0x00,0x00,0x00,0x00,
+                             0x0b,0xb8,0x00,0x05,0x0b,0xb8,0x00,0x05,
+                             0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+    #SendData1_length = 0x04
+    reader_cmd_setup(CMD_SET_WORK_ANT_PARA, SendData1, SendData1_length) #SendData_length)
+    print(binascii.hexlify(SendData1))
+    #print (SendData1_length[0])
     Response1=(b'\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00')
     resuilt=dll.SYSIOT_RS232_Python_ExeCution(PortBytes,SendData1_length,SendData1,Response1_length,Response1)
-#    print("resuilt:", resuilt)
-#    print(binascii.hexlify(Response1))
+    #print("resuilt:", resuilt)   
+    print(binascii.hexlify(Response1))
+    
+    '''
+    print(" ")
+    print("CMD_SET_WORK_ANT ")
+    CMD_SET_WORK_ANT = [0xff,0x06,0x3f,0x02,0x01]
+    #SendData1_length = 0x04
+    reader_cmd_setup(CMD_SET_WORK_ANT, SendData1, SendData1_length) #SendData_length)
+    print(binascii.hexlify(SendData1))
+    #print (SendData1_length[0])
+    Response1=(b'\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00')
+    resuilt=dll.SYSIOT_RS232_Python_ExeCution(PortBytes,SendData1_length,SendData1,Response1_length,Response1)
+    #print("resuilt:", resuilt)
+    print(binascii.hexlify(Response1))
+    
+    
+    ##
+    print(" ")
+    print("CMD_GET_WORK_ANT_PARA ")
+    CMD_GET_WORK_ANT_PARA = [0xff,0x05,0x3f,0x01]
+    #SendData1_length = 0x04
+    reader_cmd_setup(CMD_GET_WORK_ANT_PARA, SendData1, SendData1_length) #SendData_length)
+    print(binascii.hexlify(SendData1))
+    #print (SendData1_length[0])
+    Response1=(b'\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00')
+    resuilt=dll.SYSIOT_RS232_Python_ExeCution(PortBytes,SendData1_length,SendData1,Response1_length,Response1)
+    #print("resuilt:", resuilt)    
+    print(binascii.hexlify(Response1))
 
     
+    #CMD_ANT_GET = [0xff,0x05,0x3F,0x01,0xA0, 0x29]
+#    print("cmd CMD_ANT_GET")
+#    reader_cmd_setup(CMD_ANT_GET, SendData1, SendData1_length)
+    print(" ")
+    print("CMD_GET_WORK_ANT ")
+    CMD_GET_WORK_ANT = [0xff,0x05,0x3f,0x03]
+    reader_cmd_setup(CMD_GET_WORK_ANT, SendData1, SendData1_length) #SendData_length)
+    print(binascii.hexlify(SendData1))
+    #print (SendData1_length[0])
+    Response1=(b'\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00')
+    resuilt=dll.SYSIOT_RS232_Python_ExeCution(PortBytes,SendData1_length,SendData1,Response1_length,Response1)
+    #print("resuilt:", resuilt)
+    print(binascii.hexlify(Response1))
+    '''
+    
+    print(" ")
   #  print("cmd CMD_STOP_MULTI...")
     resuilt=dll.SYSIOT_RS232_Python_MultiTagReadStop(PortBytes)
 #    print ("SYSIOT_RS232_Python_MultiTagReadStop resuilt:", resuilt) 
     
     #ant_file = open("/var/tmp/ant.txt", "r")
-    ant_file = open("/home/pi/BHA/db_url.txt", "r")
-    ant.ant_flg = ant_file.readline()
+    #ant_file = open("/home/pi/BHA/db_url.txt", "r")
+    ant_file = open("/var/tmp/ant.txt", "r")
+    antenna = ant_file.readline()
+    # ant is Use Antenna One or ... Two, so find
+    if 'T' in antenna:
+        ant.ant_flg = 1 # the word Two is there
+    else:
+        ant.ant_flg = 0 # the word Two is not there; so use One
+    ant_file.close()
     print("ANTENNA FLAG = ", ant.ant_flg)
+    
+    ###
+    print("CMD_SET_WORK_ANT ")
+    
+    CMD_SET_WORK_ANT = [0xff,0x06,0x3f,0x02] #,0x01]
+    CMD_SET_WORK_ANT.append(ant.ant_flg)
+    reader_cmd_setup(CMD_SET_WORK_ANT, SendData1, SendData1_length) #SendData_length)
+    print(binascii.hexlify(SendData1))
+    #print (SendData1_length[0])
+    Response1=(b'\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00\0x00')
+    resuilt=dll.SYSIOT_RS232_Python_ExeCution(PortBytes,SendData1_length,SendData1,Response1_length,Response1)
+    #print("resuilt:", resuilt)
+    print(binascii.hexlify(Response1))
+    print(" ")
+    ###
     
     # CMD_MULTI_ID = [0xff,0x08,0xC1,0x02,0x05,0x00,0xBC]
   #  print("cmd CMD_MULTI_ID")
     reader_cmd_setup(CMD_MULTI_ID, SendData1, SendData1_length)
     resuilt=dll.SYSIOT_RS232_Python_MultiTagReadStart(PortBytes,SendData1_length,SendData1)
-#    print("SYSIOT_RS232_Python_MultiTagReadStart resuilt:", resuilt)
-    
+    #print("SYSIOT_RS232_Python_MultiTagReadStart resuilt:", resuilt)
+    #print(binascii.hexlify(SendData1))
     n=1
     global row
     row = 0

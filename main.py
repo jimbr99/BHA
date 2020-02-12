@@ -7,11 +7,20 @@ from time import sleep
 import global_objects
 import periodic
 import reader
+import os.path
+
 
 
 def init():
     global_objects.g_periodic_task_flags =  global_objects.NO_TASK
- 
+    
+def init_ant():
+    if not os.path.isfile("/var/tmp/ant.txt"):
+        ant = open("/var/tmp/ant.txt", "w")
+        ant.write("Use Antenna One")
+        ant.close()
+        print("Use Antenna One")
+    
 def main():
     # setup debug I/O
     GPIO.setwarnings(False)
@@ -27,7 +36,7 @@ def main():
     periodic.set_st()
     reader.set_stcomm()
     reader.set_sttxrx()
-    
+    init_ant()
     
     # start 50ms timer thread
     periodic.timer0()
